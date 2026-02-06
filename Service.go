@@ -61,6 +61,11 @@ func NewService(serviceConfig *ServiceConfig) (*Service, *errortools.Error) {
 }
 
 func (service *Service) httpRequest(requestConfig *go_http.RequestConfig) (*http.Request, *http.Response, *errortools.Error) {
+	// add authentication header
+	header := http.Header{}
+	header.Set("apikey", service.apiKey)
+	(*requestConfig).NonDefaultHeaders = &header
+
 	// add error model
 	service.errorResponse = &ErrorResponse{}
 	(*requestConfig).ErrorModel = &service.errorResponse
@@ -78,7 +83,6 @@ func (service *Service) urlV1(path string, values *url.Values) string {
 	if values != nil {
 		values_ = *values
 	}
-	values_.Set("user_key", service.apiKey)
 
 	apiPath_ := apiPathV1
 	if service.isTest {
@@ -93,7 +97,6 @@ func (service *Service) urlV2(path string, values *url.Values) string {
 	if values != nil {
 		values_ = *values
 	}
-	values_.Set("user_key", service.apiKey)
 
 	apiPath_ := apiPathV2
 	if service.isTest {
